@@ -259,11 +259,9 @@ void freeContextData(ContextData* cdata)
 
 void loadFunctionPointers()
 {
-    //glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress("glGenFramebuffers");
-    //glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress("glBindFramebuffer");
-    //glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glXGetProcAddress("glFramebufferTexture2D");
-
-    
+    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress("glGenFramebuffers");
+    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress("glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glXGetProcAddress("glFramebufferTexture2D");
     glCreateShader = (PFNGLCREATESHADERPROC)glXGetProcAddress("glCreateShader");
     glShaderSource = (PFNGLSHADERSOURCEPROC)glXGetProcAddress("glShaderSource");
     glCompileShader = (PFNGLCOMPILESHADERPROC)glXGetProcAddress("glCompileShader");
@@ -287,7 +285,7 @@ void loadFunctionPointers()
 }
 
 
-unsigned createBasicProgram()
+unsigned createStepProgram()
 {
     unsigned vertex, fragment;
     unsigned program;
@@ -297,12 +295,9 @@ unsigned createBasicProgram()
     const char* vsCode[] =
         {
             "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-            "layout (location = 1) in vec2 aTexCoord;\n"
-            "out vec2 TexCoord;\n"
+            "layout (location = 0) in vec2 aPos;\n"
             "void main()\n"
-            "{gl_Position = vec4(aPos, 1.0);\n"
-            "TexCoord = aTexCoord;}\n"
+            "{gl_Position = vec4(aPos, 0.0, 1.0);}\n"
         };
     
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -320,13 +315,23 @@ unsigned createBasicProgram()
     const char* fsCode[] =
         {
             "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "in vec2 TexCoord;\n"
-            "uniform sampler2D ourTexture;\n"
+            "out float res;\n"
+            "uniform sampler2D prevState;\n"
             "void main()\n"
-            "{\n"
-            "FragColor = texture(ourTexture, TexCoord);\n"
-            "}\n"
+            "{vec2 onePixel = vec2(1) / textureSize(prevState, 0);\n"
+            "vec2 pos = gl_FragCoord.xy/textureSize(prevState, 0);\n"
+            "float mySand = texture(prevState, pos).r;\n"
+            "res = mySand;\n"
+            "if (mySand >= 4)\n"
+            "{res -= 4;}\n"
+            "if (texture(prevState, pos + vec2(onePixel.x, 0)).r >= 4)\n"
+            "res += 1;\n"
+            "if (texture(prevState, pos + vec2(-onePixel.x, 0)).r >= 4)\n"
+            "res += 1;\n"
+            "if (texture(prevState, pos + vec2(0, onePixel.y)).r >= 4)\n"
+            "res += 1;\n"
+            "if (texture(prevState, pos + vec2(0, -onePixel.y)).r >= 4)\n"
+            "res += 1;}\n"
         };
     
     fragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -357,6 +362,85 @@ unsigned createBasicProgram()
 
     return program;
 }
+
+unsigned createBasicProgram()
+{
+    unsigned vertex, fragment;
+    unsigned program;
+    int success;
+    char infoLog[512];
+    
+    const char* vsCode[] =
+        {
+            "#version 330 core\n"
+            "layout (location = 0) in vec2 aPos;\n"
+            "void main()\n"
+            "{gl_Position = vec4(aPos, 0.0, 1.0);}\n"
+        };
+    
+    vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, vsCode, NULL);
+    glCompileShader(vertex);
+
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(vertex, 512, NULL, infoLog);
+        printf("vertex shader error: %s\n", infoLog);
+    };
+
+    
+    const char* fsCode[] =
+        {
+            "#version 330 core\n"
+            "out vec4 FragColor;\n"
+            "uniform sampler2D tex;\n"
+            "bool cmp(const float a, const float b)\n"
+            "{ return abs(a - b) < 0.0001f;}\n"
+            "void main()\n"
+            "{   vec2 pos = gl_FragCoord.xy/textureSize(tex, 0);\n"
+            "float mySand = texture(tex, pos).r;\n"
+            "if (mySand >= 4)\n"
+            "FragColor = vec4(1);\n"
+            "else if (cmp(mySand, 3.0f) )\n"
+            " FragColor = vec4(1, 0, 0, 1);\n"
+            "else if (cmp(mySand, 2.0f) )\n"
+            " FragColor = vec4(0, 1, 0, 1);\n"
+            "else if (cmp(mySand, 1.0f) )\n"
+            " FragColor = vec4(0, 0, 1, 1);\n"
+            "else if (cmp(mySand, 0.0f) )\n"
+            " FragColor = vec4(0, 0, 0, 1);   }\n"
+        };
+    
+    fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, fsCode, NULL);
+    glCompileShader(fragment);
+
+    glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
+    if(!success)
+    {
+        glGetShaderInfoLog(fragment, 512, NULL, infoLog);
+        printf("fragment shader error: %s\n", infoLog);
+    };
+
+    program = glCreateProgram();
+    glAttachShader(program, vertex);
+    glAttachShader(program, fragment);
+    glLinkProgram(program);
+
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog(program, 512, NULL, infoLog);
+        printf("%s\n", infoLog);     
+    }
+
+    glDeleteShader(vertex);
+    glDeleteShader(fragment);
+
+    return program;
+}
+
 
 unsigned RGBAtoUnsigned(const unsigned char r, const unsigned char g,
                         const unsigned char b, const unsigned char a)

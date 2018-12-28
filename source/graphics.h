@@ -48,11 +48,9 @@ typedef struct
     
 } Color;
 
-#if 0
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-#endif
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLCOMPILESHADERPROC glCompileShader;
@@ -73,8 +71,6 @@ PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
-
-
 
 void configureOpenGL(ContextData* cdata);
 
@@ -104,6 +100,6 @@ unsigned ColorToUnsigned(const Color* c);
 Color RGBAtoColor(const unsigned char r, const unsigned char g,
                   const unsigned char b, const unsigned char a);
 
-
+unsigned createStepProgram();
 
 #endif
