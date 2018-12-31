@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
             break;
         }
 
-        glClearColor(0, 0.5, 1, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
+        //glClearColor(0, 0.5, 1, 1);
+        //glClear(GL_COLOR_BUFFER_BIT);
 
         //NOTE(Stanisz13):
         //Draw on the current fbo using the old texture
@@ -76,7 +76,6 @@ int main(int argc, char* argv[])
         //NOTE(Stanisz13):
         //Begin drawing on the 0th framebuffer - screen
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
         //NOTE(Stanisz13):
         //Draw on the 0th framebuffer using the data that filled
         //the current fbo (its texture precisely)

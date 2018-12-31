@@ -2,10 +2,10 @@ CXX = gcc-8
 SRCS_DIR = source
 
 CXXFLAGS = -Wall -Wshadow
-DEBUG_FLAGS = -fsanitize=undefined -fsanitize=address
-RELEASE_FLAGS = -O3 -flto -Ofast
+DEBUG_FLAGS = -O0 -fsanitize=undefined -fsanitize=address
+RELEASE_FLAGS = -O3 -flto
 
-LD_FLAGS = $(LD_DIRS) -lpthread -lX11 -lGL
+LD_FLAGS = $(LD_DIRS) -lX11 -lGL
 
 BUILD_DIR = build
 DEBUG_BUILD_DIR = $(BUILD_DIR)/debug

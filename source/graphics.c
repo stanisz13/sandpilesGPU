@@ -547,9 +547,9 @@ void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, pbuf->fbo[i]);
         glBindTexture(GL_TEXTURE_2D, pbuf->texture[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32UI,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
                      cdata->windowWidth, cdata->windowHeight,
-                     0, GL_RED, GL_UNSIGNED_BYTE, 0);
+                     0, GL_RED, GL_FLOAT, 0);
             
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
