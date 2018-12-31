@@ -36,24 +36,32 @@ int main(int argc, char* argv[])
     
     int old = 0, now = 1;
 
-    unsigned VBO, VAO;
+    unsigned VBO, VAO, EBO;
 
     float screenQuadVerts[] =
         {
-            -1.0f,  1.0f,
+            1.0f,  1.0f,
+            1.0f, -1.0f,
             -1.0f, -1.0f,
-            1.0f, -1.0f,
-            -1.0f,  1.0f,
-            1.0f, -1.0f,
-            1.0f,  1.0f
+            -1.0f,  1.0f
         };
 
+    unsigned indices[] =
+        {
+            0, 1, 3, 2
+        };
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    
     glBindVertexArray(VAO);
+
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(screenQuadVerts), &screenQuadVerts, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -89,7 +97,7 @@ int main(int argc, char* argv[])
         glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[now]);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[old]);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         
@@ -97,7 +105,7 @@ int main(int argc, char* argv[])
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[now]);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
         
         int tmp = old;
         old = now;
