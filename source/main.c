@@ -19,26 +19,20 @@ int main(int argc, char* argv[])
 
     float* pixels = (float*)malloc(contextData.windowHeight * contextData.windowWidth * sizeof(float));
     pixels[contextData.windowHeight/ 2 * contextData.windowWidth + contextData.windowWidth / 2] = 10000;
-    
-    unsigned int pingpongFBO[2];
-    unsigned int pingpongBuffer[2];
-    glGenFramebuffers(2, pingpongFBO);
-    glGenTextures(2, pingpongBuffer);
+
+    PingpongBuffer pbuffer;
+    configurePingpongBuffer(&contextData, &pbuffer);
+
     for (unsigned int i = 0; i < 2; i++)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+        glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[i]);
+        glBindTexture(GL_TEXTURE_2D, pbuffer.texture[i]);
+
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
                      contextData.windowWidth, contextData.windowHeight,
                      0, GL_RED, GL_FLOAT, i == 0 ? pixels : 0);
-            
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                               GL_TEXTURE_2D, pingpongBuffer[i], 0);
-    }        
+    }
+
     
     int old = 0, now = 1;
 
@@ -92,8 +86,8 @@ int main(int argc, char* argv[])
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(step);
-        glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[now]);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[old]);
+        glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[now]);
+        glBindTexture(GL_TEXTURE_2D, pbuffer.texture[old]);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -101,7 +95,7 @@ int main(int argc, char* argv[])
         
         glUseProgram(basic);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, pingpongBuffer[now]);
+        glBindTexture(GL_TEXTURE_2D, pbuffer.texture[now]);
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         

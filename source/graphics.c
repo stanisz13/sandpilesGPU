@@ -538,3 +538,25 @@ Color RGBAtoColor(const unsigned char r, const unsigned char g,
     
     return res;
 }
+
+void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
+{
+    glGenFramebuffers(2, pbuf->fbo);
+    glGenTextures(2, pbuf->texture);
+    for (unsigned int i = 0; i < 2; i++)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, pbuf->fbo[i]);
+        glBindTexture(GL_TEXTURE_2D, pbuf->texture[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
+                     cdata->windowWidth, cdata->windowHeight,
+                     0, GL_RED, GL_FLOAT, 0);
+            
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                               GL_TEXTURE_2D, pbuf->texture[i], 0);
+    }        
+
+}
