@@ -83,7 +83,7 @@ void configureOpenGL(ContextData* cdata)
             None
         };
 
-    unsigned glx_major, glx_minor;
+    int glx_major, glx_minor;
  
     // Check if the version is not less than minimal
     if (!glXQueryVersion(cdata->display, &glx_major, &glx_minor))
@@ -131,9 +131,9 @@ void configureOpenGL(ContextData* cdata)
                    " SAMPLES = %d\n", 
                    i, vi->visualid, samp_buf, samples);
 #endif
-            if (best_fbc < 0 || samp_buf && samples > best_num_samp)
+            if (best_fbc < 0 || (samp_buf && samples > best_num_samp))
                 best_fbc = i, best_num_samp = samples;
-            if (worst_fbc < 0 || !samp_buf || samples < worst_num_samp)
+            if (worst_fbc < 0 || (!samp_buf || samples < worst_num_samp))
                 worst_fbc = i, worst_num_samp = samples;
         }
         
@@ -259,29 +259,29 @@ void freeContextData(ContextData* cdata)
 
 void loadFunctionPointers()
 {
-    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress("glGenFramebuffers");
-    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress("glBindFramebuffer");
-    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glXGetProcAddress("glFramebufferTexture2D");
-    glCreateShader = (PFNGLCREATESHADERPROC)glXGetProcAddress("glCreateShader");
-    glShaderSource = (PFNGLSHADERSOURCEPROC)glXGetProcAddress("glShaderSource");
-    glCompileShader = (PFNGLCOMPILESHADERPROC)glXGetProcAddress("glCompileShader");
-    glGetShaderiv = (PFNGLGETSHADERIVPROC)glXGetProcAddress("glGetShaderiv");
-    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)glXGetProcAddress("glGetShaderInfoLog");
-    glCreateProgram = (PFNGLCREATEPROGRAMPROC)glXGetProcAddress("glCreateProgram");
-    glAttachShader = (PFNGLATTACHSHADERPROC)glXGetProcAddress("glAttachShader");
-    glLinkProgram = (PFNGLLINKPROGRAMPROC)glXGetProcAddress("glLinkProgram");
-    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)glXGetProcAddress("glGetProgramiv");
-    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)glXGetProcAddress("glGetProgramInfoLog");
-    glDeleteShader = (PFNGLDELETESHADERPROC)glXGetProcAddress("glDeleteShader");
-    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress("glGenVertexArrays");
-    glGenBuffers = (PFNGLGENBUFFERSPROC)glXGetProcAddress("glGenBuffers");
-    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress("glGenVertexArrays");
-    glBindBuffer = (PFNGLBINDBUFFERPROC)glXGetProcAddress("glBindBuffer");
-    glBufferData = (PFNGLBUFFERDATAPROC)glXGetProcAddress("glBufferData");
-    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)glXGetProcAddress("glVertexAttribPointer");
-    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress("glEnableVertexAttribArray");
-    glUseProgram = (PFNGLUSEPROGRAMPROC)glXGetProcAddress("glUseProgram");
-    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress("glBindVertexArray");
+    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glGenFramebuffers");
+    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glXGetProcAddress((const unsigned char*)"glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glXGetProcAddress((const unsigned char*)"glFramebufferTexture2D");
+    glCreateShader = (PFNGLCREATESHADERPROC)glXGetProcAddress((const unsigned char*)"glCreateShader");
+    glShaderSource = (PFNGLSHADERSOURCEPROC)glXGetProcAddress((const unsigned char*)"glShaderSource");
+    glCompileShader = (PFNGLCOMPILESHADERPROC)glXGetProcAddress((const unsigned char*)"glCompileShader");
+    glGetShaderiv = (PFNGLGETSHADERIVPROC)glXGetProcAddress((const unsigned char*)"glGetShaderiv");
+    glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)glXGetProcAddress((const unsigned char*)"glGetShaderInfoLog");
+    glCreateProgram = (PFNGLCREATEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glCreateProgram");
+    glAttachShader = (PFNGLATTACHSHADERPROC)glXGetProcAddress((const unsigned char*)"glAttachShader");
+    glLinkProgram = (PFNGLLINKPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glLinkProgram");
+    glGetProgramiv = (PFNGLGETPROGRAMIVPROC)glXGetProcAddress((const unsigned char*)"glGetProgramiv");
+    glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)glXGetProcAddress((const unsigned char*)"glGetProgramInfoLog");
+    glDeleteShader = (PFNGLDELETESHADERPROC)glXGetProcAddress((const unsigned char*)"glDeleteShader");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const unsigned char*)"glGenVertexArrays");
+    glGenBuffers = (PFNGLGENBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glGenBuffers");
+    glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glXGetProcAddress((const unsigned char*)"glGenVertexArrays");
+    glBindBuffer = (PFNGLBINDBUFFERPROC)glXGetProcAddress((const unsigned char*)"glBindBuffer");
+    glBufferData = (PFNGLBUFFERDATAPROC)glXGetProcAddress((const unsigned char*)"glBufferData");
+    glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)glXGetProcAddress((const unsigned char*)"glVertexAttribPointer");
+    glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress((const unsigned char*)"glEnableVertexAttribArray");
+    glUseProgram = (PFNGLUSEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glUseProgram");
+    glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const unsigned char*)"glBindVertexArray");
 }
 
 
