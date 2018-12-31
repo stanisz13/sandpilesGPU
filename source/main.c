@@ -33,42 +33,15 @@ int main(int argc, char* argv[])
                      0, GL_RED, GL_FLOAT, i == 0 ? pixels : 0);
     }
 
-    
-    int old = 0, now = 1;
-
-    unsigned VBO, VAO, EBO;
-
-    float screenQuadVerts[] =
-        {
-            1.0f,  1.0f,
-            1.0f, -1.0f,
-            -1.0f, -1.0f,
-            -1.0f,  1.0f
-        };
-
-    unsigned indices[] =
-        {
-            0, 1, 3, 2
-        };
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(screenQuadVerts), &screenQuadVerts, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    ScreenQuad squad;
+    configureScreenQuad(&squad);
     
     unsigned basic = createBasicProgram();
     unsigned step = createStepProgram();
-    
+
+    int old = 0, now = 1;
+
+        
     while(1)
     {        
         XEvent event;
@@ -93,18 +66,23 @@ int main(int argc, char* argv[])
         glClearColor(0, 0.5, 1, 1);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //NOTE(Stanisz13):
+        //Draw on the current fbo using the old texture
         glUseProgram(step);
         glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[now]);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[old]);
-        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
-        glBindTexture(GL_TEXTURE_2D, 0);
+
+        //NOTE(Stanisz13):
+        //Begin drawing on the 0th framebuffer - screen
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        
+
+        //NOTE(Stanisz13):
+        //Draw on the 0th framebuffer using the data that filled
+        //the current fbo (its texture precisely)
         glUseProgram(basic);
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[now]);
-        glBindVertexArray(VAO);
+        glBindVertexArray(squad.VAO);
         glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
         
         int tmp = old;

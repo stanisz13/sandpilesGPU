@@ -55,6 +55,12 @@ typedef struct
 
 } PingpongBuffer;
 
+typedef struct
+{
+    unsigned VBO, VAO, EBO;
+    
+} ScreenQuad;
+
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
@@ -110,5 +116,7 @@ Color RGBAtoColor(const unsigned char r, const unsigned char g,
 unsigned createStepProgram();
 
 void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf);
+
+void configureScreenQuad(ScreenQuad* squad);
 
 #endif
