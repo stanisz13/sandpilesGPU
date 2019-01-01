@@ -5,6 +5,9 @@ int isRunning = 1;
 
 int main(int argc, char* argv[])
 {
+    newLine();
+    newLine();
+    
     ContextData contextData;
     contextData.minimalGLXVersionMajor = 1;
     contextData.minimalGLXVersionMinor = 3;
@@ -25,7 +28,7 @@ int main(int argc, char* argv[])
 
     for (unsigned int i = 0; i < 2; i++)
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[i]);
+        glBindFramebuffer_FA(GL_FRAMEBUFFER, pbuffer.fbo[i]);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[i]);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
@@ -33,7 +36,7 @@ int main(int argc, char* argv[])
                      0, GL_RED, GL_FLOAT, i == 0 ? pixels : 0);
     }
 
-#define EBO 0
+#define EBO 1
 #if EBO == 1
     ScreenQuadWithEBO squad;
     configureScreenQuadWithEBO(&squad);
@@ -49,12 +52,7 @@ int main(int argc, char* argv[])
 
     glDisable(GL_DEPTH_TEST);
 
-    GLXDrawable drawable = glXGetCurrentDrawable();
-    const int interval = 0;
-
-    printf("%p\n", glXSwapIntervalMESA);
-    glXSwapIntervalMESA(0);
-    //glXSwapIntervalEXT(contextData.display, drawable, interval);
+    glXSwapIntervalMESA_FA(0);
     
     while(1)
     {        
@@ -82,11 +80,11 @@ int main(int argc, char* argv[])
 
         //NOTE(Stanisz13):
         //Draw on the current fbo using the old texture
-        glUseProgram(step);
+        glUseProgram_FA(step);
 
         for (unsigned i = 0; i < 1; ++i)
         {        
-            glBindFramebuffer(GL_FRAMEBUFFER, pbuffer.fbo[now]);
+            glBindFramebuffer_FA(GL_FRAMEBUFFER, pbuffer.fbo[now]);
             glBindTexture(GL_TEXTURE_2D, pbuffer.texture[old]);
             
 #if EBO == 1
@@ -100,11 +98,11 @@ int main(int argc, char* argv[])
         }
         //NOTE(Stanisz13):
         //Begin drawing on the 0th framebuffer - screen
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer_FA(GL_FRAMEBUFFER, 0);
         //NOTE(Stanisz13):
         //Draw on the 0th framebuffer using the data that filled
         //the current fbo (its texture precisely)
-        glUseProgram(basic);
+        glUseProgram_FA(basic);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[now]);
 #if EBO == 1
         glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
