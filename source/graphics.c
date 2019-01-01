@@ -292,6 +292,7 @@ void loadFunctionPointers()
     glEnableVertexAttribArray_FA = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress((const unsigned char*)"glEnableVertexAttribArray");
     glUseProgram_FA = (PFNGLUSEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glUseProgram");
     glBindVertexArray_FA = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const unsigned char*)"glBindVertexArray");
+    glDeleteBuffers_FA = (PFNGLDELETEBUFFERSPROC)glXGetProcAddress((const unsigned char*)"glDeleteBuffers_FA");
     
     //NOTE(Stanisz13): MISC
     glXSwapIntervalMESA_FA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalMESA");
@@ -628,4 +629,16 @@ void configureScreenQuad(ScreenQuad* squad)
     glVertexAttribPointer_FA(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray_FA(0);
     
+}
+
+
+void freeScreenQuad(ScreenQuad* squad)
+{
+    glDeleteBuffers_FA(1, &squad->VBO);
+}
+
+void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad)
+{
+    glDeleteBuffers_FA(1, &squad->VBO);
+    glDeleteBuffers_FA(1, &squad->EBO);
 }

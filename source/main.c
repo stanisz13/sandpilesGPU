@@ -117,5 +117,12 @@ int main(int argc, char* argv[])
 
     freeContextData(&contextData);
     free(pixels);
+
+#if EBO == 1
+    freeScreenQuadWithEBO(&squad);
+#else
+    freeScreenQuad(&squad);
+#endif
+    
     return 0;
 }

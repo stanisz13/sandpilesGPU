@@ -41,6 +41,7 @@ PFNGLBUFFERDATAPROC glBufferData_FA;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer_FA;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray_FA;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray_FA;
+PFNGLDELETEBUFFERSPROC glDeleteBuffers_FA;
 
 //NOTE(Stanisz13): MISC
 PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA_FA;
@@ -137,5 +138,8 @@ void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad);
 
 void configureScreenQuad(ScreenQuad* squad);
 
+void freeScreenQuad(ScreenQuad* squad);
+
+void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad);
 
 #endif
