@@ -59,6 +59,12 @@ typedef struct
 {
     unsigned VBO, VAO, EBO;
     
+} ScreenQuadWithEBO;
+
+typedef struct
+{
+    unsigned VBO, VAO;
+    
 } ScreenQuad;
 
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
@@ -84,6 +90,7 @@ PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLXSWAPINTERVALMESAPROC glXSwapIntervalMESA;
 
 void configureOpenGL(ContextData* cdata);
 
@@ -117,6 +124,9 @@ unsigned createStepProgram();
 
 void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf);
 
+void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad);
+
 void configureScreenQuad(ScreenQuad* squad);
+
 
 #endif

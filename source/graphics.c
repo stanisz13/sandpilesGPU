@@ -185,11 +185,14 @@ void configureOpenGL(ContextData* cdata)
     int (*oldHandler)(Display*, XErrorEvent*) =
         XSetErrorHandler(&ctxErrorHandler);
 
+    //logS(glxExts);
+     
     // Check for the GLX_ARB_create_context extension string and the function.
     if (!isExtensionSupported(glxExts, "GLX_ARB_create_context") ||
+        !isExtensionSupported(glxExts, "GLX_MESA_swap_control") ||
          !glXCreateContextAttribsARB)
     {
-        logError( "glXCreateContextAttribsARB() not found!");
+        logError("glXCreateContextAttribsARB() or one of required extensions not found!");
         exit(0);    
     }
     else
@@ -282,6 +285,7 @@ void loadFunctionPointers()
     glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glXGetProcAddress((const unsigned char*)"glEnableVertexAttribArray");
     glUseProgram = (PFNGLUSEPROGRAMPROC)glXGetProcAddress((const unsigned char*)"glUseProgram");
     glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)glXGetProcAddress((const unsigned char*)"glBindVertexArray");
+    glXSwapIntervalMESA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalMESA");
 }
 
 
@@ -297,7 +301,7 @@ unsigned createStepProgram()
             "#version 330 core\n"
             "layout (location = 0) in vec2 aPos;\n"
             "void main()\n"
-            "{gl_Position = vec4(aPos, 0.0, 1.0);}\n"
+            "{gl_Position = vec4(aPos, 0.0f, 1.0f);}\n"
         };
     
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -318,7 +322,7 @@ unsigned createStepProgram()
             "out float res;\n"
             "uniform sampler2D prevState;\n"
             "void main()\n"
-            "{vec2 onePixel = vec2(1) / textureSize(prevState, 0);\n"
+            "{vec2 onePixel = vec2(1.0f) / textureSize(prevState, 0);\n"
             "vec2 pos = gl_FragCoord.xy/textureSize(prevState, 0);\n"
             "float mySand = texture(prevState, pos).r;\n"
             "res = mySand;\n"
@@ -375,7 +379,7 @@ unsigned createBasicProgram()
             "#version 330 core\n"
             "layout (location = 0) in vec2 aPos;\n"
             "void main()\n"
-            "{gl_Position = vec4(aPos, 0.0, 1.0);}\n"
+            "{gl_Position = vec4(aPos, 0.0f, 1.0f);}\n"
         };
     
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -550,7 +554,7 @@ void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
         glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F,
                      cdata->windowWidth, cdata->windowHeight,
                      0, GL_RED, GL_FLOAT, 0);
-            
+          
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -561,14 +565,14 @@ void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf)
 
 }
 
-void configureScreenQuad(ScreenQuad* squad)
+void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad)
 {
     float screenQuadVerts[] =
         {
             1.0f,  1.0f,
-            1.0f, -1.0f,
+            -1.0f, 1.0f,
             -1.0f, -1.0f,
-            -1.0f,  1.0f
+            1.0f, -1.0f,
         };
 
     unsigned indices[] =
@@ -590,4 +594,29 @@ void configureScreenQuad(ScreenQuad* squad)
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+}
+
+void configureScreenQuad(ScreenQuad* squad)
+{
+    float screenQuadVerts[] =
+        {
+            1.0f,  1.0f,
+            -1.0f, 1.0f,
+            -1.0f, -1.0f,
+            -1.0f, -1.0f,
+            1.0f, -1.0f,
+            1.0f, 1.0f
+        };
+
+    glGenVertexArrays(1, &squad->VAO);
+    glGenBuffers(1, &squad->VBO);
+    
+    glBindVertexArray(squad->VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, squad->VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(screenQuadVerts), &screenQuadVerts, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    
 }
