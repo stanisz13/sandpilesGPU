@@ -3,6 +3,8 @@
 
 int isRunning = 1;
 
+#define USE_EBO_TO_DRAW_QUAD 1
+
 int main(int argc, char* argv[])
 {
     newLine();
@@ -36,8 +38,7 @@ int main(int argc, char* argv[])
                      0, GL_RED, GL_FLOAT, i == 0 ? pixels : 0);
     }
 
-#define EBO 1
-#if EBO == 1
+#if USE_EBO_TO_DRAW_QUAD == 1
     ScreenQuadWithEBO squad;
     configureScreenQuadWithEBO(&squad);
 #else
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
             glBindFramebuffer_FA(GL_FRAMEBUFFER, pbuffer.fbo[now]);
             glBindTexture(GL_TEXTURE_2D, pbuffer.texture[old]);
             
-#if EBO == 1
+#if USE_EBO_TO_DRAW_QUAD == 1
             glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
 #else
             glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -104,7 +105,7 @@ int main(int argc, char* argv[])
         //the current fbo (its texture precisely)
         glUseProgram_FA(basic);
         glBindTexture(GL_TEXTURE_2D, pbuffer.texture[now]);
-#if EBO == 1
+#if USE_EBO_TO_DRAW_QUAD == 1
         glDrawElements(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0);
 #else
         glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -118,7 +119,7 @@ int main(int argc, char* argv[])
     freeContextData(&contextData);
     free(pixels);
 
-#if EBO == 1
+#if USE_EBO_TO_DRAW_QUAD == 1
     freeScreenQuadWithEBO(&squad);
 #else
     freeScreenQuad(&squad);
