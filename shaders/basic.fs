@@ -18,13 +18,13 @@ void main()
 	FragColor = vec4(1);
 
 	else if (cmp(mySand, 3.0f) )
-	FragColor = vec4(1, 0, 0, 1);
+	FragColor = vec4(0.92, 0.11, 0.22, 1);
 
 	else if (cmp(mySand, 2.0f) )
-	FragColor = vec4(0, 1, 0, 1);
+	FragColor = vec4(0.45, 0.51, 0.84, 1);
 
 	else if (cmp(mySand, 1.0f) )
-	FragColor = vec4(0, 0, 1, 1);
+	FragColor = vec4(0.02, 0.80, 0.11, 1);
 
 	else if (cmp(mySand, 0.0f) )
 	FragColor = vec4(0, 0, 0, 1);

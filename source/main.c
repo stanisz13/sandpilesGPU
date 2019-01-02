@@ -123,6 +123,9 @@ int main(int argc, char* argv[])
 #else
     freeScreenQuad(&squad);
 #endif
+
+    glDeleteProgram_FA(basic);
+    glDeleteProgram_FA(step);
     
     return 0;
 }
