@@ -298,164 +298,6 @@ void loadFunctionPointers()
     glXSwapIntervalMESA_FA = (PFNGLXSWAPINTERVALMESAPROC)glXGetProcAddress((const unsigned char*)"glXSwapIntervalMESA");
 }
 
-
-unsigned createStepProgram()
-{
-    unsigned vertex, fragment;
-    unsigned program;
-    int success;
-    char infoLog[512];
-    
-    const char* vsCode[] =
-        {
-            "#version 330 core\n"
-            "layout (location = 0) in vec2 aPos;\n"
-            "void main()\n"
-            "{gl_Position = vec4(aPos, 0.0f, 1.0f);}\n"
-        };
-    
-    vertex = glCreateShader_FA(GL_VERTEX_SHADER);
-    glShaderSource_FA(vertex, 1, vsCode, NULL);
-    glCompileShader_FA(vertex);
-
-    glGetShaderiv_FA(vertex, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog_FA(vertex, 512, NULL, infoLog);
-        printf("vertex shader error: %s\n", infoLog);
-    };
-
-    
-    const char* fsCode[] =
-        {
-            "#version 330 core\n"
-            "out float res;\n"
-            "uniform sampler2D prevState;\n"
-            "void main()\n"
-            "{vec2 onePixel = vec2(1.0f) / textureSize(prevState, 0);\n"
-            "vec2 pos = gl_FragCoord.xy/textureSize(prevState, 0);\n"
-            "float mySand = texture(prevState, pos).r;\n"
-            "res = mySand;\n"
-            "if (mySand >= 4)\n"
-            "{res -= 4;}\n"
-            "if (texture(prevState, pos + vec2(onePixel.x, 0)).r >= 4)\n"
-            "res += 1;\n"
-            "if (texture(prevState, pos + vec2(-onePixel.x, 0)).r >= 4)\n"
-            "res += 1;\n"
-            "if (texture(prevState, pos + vec2(0, onePixel.y)).r >= 4)\n"
-            "res += 1;\n"
-            "if (texture(prevState, pos + vec2(0, -onePixel.y)).r >= 4)\n"
-            "res += 1;}\n"
-        };
-    
-    fragment = glCreateShader_FA(GL_FRAGMENT_SHADER);
-    glShaderSource_FA(fragment, 1, fsCode, NULL);
-    glCompileShader_FA(fragment);
-
-    glGetShaderiv_FA(fragment, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog_FA(fragment, 512, NULL, infoLog);
-        printf("fragment shader error: %s\n", infoLog);
-    };
-
-    program = glCreateProgram_FA();
-    glAttachShader_FA(program, vertex);
-    glAttachShader_FA(program, fragment);
-    glLinkProgram_FA(program);
-
-    glGetProgramiv_FA(program, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        glGetProgramInfoLog_FA(program, 512, NULL, infoLog);
-        printf("%s\n", infoLog);     
-    }
-
-    glDeleteShader_FA(vertex);
-    glDeleteShader_FA(fragment);
-
-    return program;
-}
-
-unsigned createBasicProgram()
-{
-    unsigned vertex, fragment;
-    unsigned program;
-    int success;
-    char infoLog[512];
-    
-    const char* vsCode[] =
-        {
-            "#version 330 core\n"
-            "layout (location = 0) in vec2 aPos;\n"
-            "void main()\n"
-            "{gl_Position = vec4(aPos, 0.0f, 1.0f);}\n"
-        };
-    
-    vertex = glCreateShader_FA(GL_VERTEX_SHADER);
-    glShaderSource_FA(vertex, 1, vsCode, NULL);
-    glCompileShader_FA(vertex);
-
-    glGetShaderiv_FA(vertex, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog_FA(vertex, 512, NULL, infoLog);
-        printf("vertex shader error: %s\n", infoLog);
-    };
-
-    
-    const char* fsCode[] =
-        {
-            "#version 330 core\n"
-            "out vec4 FragColor;\n"
-            "uniform sampler2D tex;\n"
-            "bool cmp(const float a, const float b)\n"
-            "{ return abs(a - b) < 0.0001f;}\n"
-            "void main()\n"
-            "{   vec2 pos = gl_FragCoord.xy/textureSize(tex, 0);\n"
-            "float mySand = texture(tex, pos).r;\n"
-            "if (mySand >= 4)\n"
-            "FragColor = vec4(1);\n"
-            "else if (cmp(mySand, 3.0f) )\n"
-            " FragColor = vec4(1, 0, 0, 1);\n"
-            "else if (cmp(mySand, 2.0f) )\n"
-            " FragColor = vec4(0, 1, 0, 1);\n"
-            "else if (cmp(mySand, 1.0f) )\n"
-            " FragColor = vec4(0, 0, 1, 1);\n"
-            "else if (cmp(mySand, 0.0f) )\n"
-            " FragColor = vec4(0, 0, 0, 1);   }\n"
-        };
-    
-    fragment = glCreateShader_FA(GL_FRAGMENT_SHADER);
-    glShaderSource_FA(fragment, 1, fsCode, NULL);
-    glCompileShader_FA(fragment);
-
-    glGetShaderiv_FA(fragment, GL_COMPILE_STATUS, &success);
-    if(!success)
-    {
-        glGetShaderInfoLog_FA(fragment, 512, NULL, infoLog);
-        printf("fragment shader error: %s\n", infoLog);
-    };
-
-    program = glCreateProgram_FA();
-    glAttachShader_FA(program, vertex);
-    glAttachShader_FA(program, fragment);
-    glLinkProgram_FA(program);
-
-    glGetProgramiv_FA(program, GL_LINK_STATUS, &success);
-    if(!success)
-    {
-        glGetProgramInfoLog_FA(program, 512, NULL, infoLog);
-        printf("%s\n", infoLog);     
-    }
-
-    glDeleteShader_FA(vertex);
-    glDeleteShader_FA(fragment);
-
-    return program;
-}
-
-
 unsigned RGBAtoUnsigned(const unsigned char r, const unsigned char g,
                         const unsigned char b, const unsigned char a)
 {
@@ -641,4 +483,82 @@ void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad)
 {
     glDeleteBuffers_FA(1, &squad->VBO);
     glDeleteBuffers_FA(1, &squad->EBO);
+}
+
+void loadEntireFile(const char* path, unsigned char** source)
+{
+    FILE* file = fopen(path, "r");
+    
+    fseek(file, 0, SEEK_END);
+    unsigned fileSize = ftell(file); 
+    fseek(file, 0, SEEK_SET);
+
+    *source = (unsigned char *)calloc(1, fileSize + 1);
+    memset(*source, 0, fileSize + 1);
+
+    if (fread(*source, fileSize, 1, file) != 1) {
+        logError("Failed reading file!");
+        logError(path);
+        
+        return;
+    }
+         
+    fclose(file);
+}
+
+unsigned createShaderProgram(const char* pathToVS, const char* pathToFS)
+{
+    unsigned vertex, fragment;
+    unsigned program;
+    int success;
+    char infoLog[512];
+
+    unsigned char* vsCode;
+    unsigned char* fsCode;
+    loadEntireFile(pathToVS, &vsCode);
+    loadEntireFile(pathToFS, &fsCode);
+    
+    vertex = glCreateShader_FA(GL_VERTEX_SHADER);
+    fragment = glCreateShader_FA(GL_FRAGMENT_SHADER);
+    glShaderSource_FA(vertex, 1, (const char**)&vsCode, NULL);
+    glShaderSource_FA(fragment, 1, (const char**)&fsCode, NULL);
+    
+    glCompileShader_FA(vertex);
+    glCompileShader_FA(fragment);
+    
+    glGetShaderiv_FA(vertex, GL_COMPILE_STATUS, &success);
+
+    if(!success)
+    {
+        glGetShaderInfoLog_FA(vertex, 512, NULL, infoLog);
+        printf("vertex shader error: %s\n", infoLog);
+    }
+
+    glGetShaderiv_FA(fragment, GL_COMPILE_STATUS, &success);
+
+    if(!success)
+    {
+        glGetShaderInfoLog_FA(fragment, 512, NULL, infoLog);
+        printf("fragment shader error: %s\n", infoLog);
+    }
+    
+    program = glCreateProgram_FA();
+    glAttachShader_FA(program, vertex);
+    glAttachShader_FA(program, fragment);
+    glLinkProgram_FA(program);
+
+    glGetProgramiv_FA(program, GL_LINK_STATUS, &success);
+    if(!success)
+    {
+        glGetProgramInfoLog_FA(program, 512, NULL, infoLog);
+        printf("%s\n", infoLog);     
+    }
+
+    glDeleteShader_FA(vertex);
+    glDeleteShader_FA(fragment);
+
+    free(vsCode);
+    free(fsCode);
+    
+    return program;
 }

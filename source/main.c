@@ -3,8 +3,6 @@
 
 int isRunning = 1;
 
-#define USE_EBO_TO_DRAW_QUAD 1
-
 int main(int argc, char* argv[])
 {
     newLine();
@@ -46,14 +44,15 @@ int main(int argc, char* argv[])
     configureScreenQuad(&squad);
 #endif
 
-    unsigned basic = createBasicProgram();
-    unsigned step = createStepProgram();
-
+    unsigned basic = createShaderProgram("shaders/basic.vs", "shaders/basic.fs");
+    unsigned step = createShaderProgram("shaders/pingpong.vs", "shaders/pingpong.fs");
+    
     int old = 0, now = 1;
 
     glDisable(GL_DEPTH_TEST);
 
     glXSwapIntervalMESA_FA(0);
+
     
     while(1)
     {        

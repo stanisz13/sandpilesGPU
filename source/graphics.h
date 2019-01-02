@@ -1,6 +1,5 @@
 #ifndef GLLOADER_H
 #define GLLOADER_H
-
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -10,6 +9,9 @@
 #include <GL/glx.h>
 #include "glext.h"
 #include "log.h"
+
+#define USE_EBO_TO_DRAW_QUAD 1
+ 
 
 //NOTE(Stanisz13): FRAMEBUFFERS
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers_FA;
@@ -108,8 +110,6 @@ void freeContextData(ContextData* cdata);
 
 void loadFunctionPointers();
 
-unsigned createBasicProgram();
-
 unsigned RGBAtoUnsigned(const unsigned char r, const unsigned char g,
                         const unsigned char b, const unsigned char a);
 
@@ -130,8 +130,6 @@ unsigned ColorToUnsigned(const Color* c);
 Color RGBAtoColor(const unsigned char r, const unsigned char g,
                   const unsigned char b, const unsigned char a);
 
-unsigned createStepProgram();
-
 void configurePingpongBuffer(ContextData* cdata, PingpongBuffer* pbuf);
 
 void configureScreenQuadWithEBO(ScreenQuadWithEBO* squad);
@@ -141,5 +139,7 @@ void configureScreenQuad(ScreenQuad* squad);
 void freeScreenQuad(ScreenQuad* squad);
 
 void freeScreenQuadWithEBO(ScreenQuadWithEBO* squad);
+
+unsigned createShaderProgram(const char* pathToVS, const char* pathToFS);
 
 #endif
